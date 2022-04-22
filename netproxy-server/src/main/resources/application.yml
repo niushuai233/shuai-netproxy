@@ -1,0 +1,4 @@
+server:
+  port: 30009
+  servlet:
+    context-path: /api/proxy
