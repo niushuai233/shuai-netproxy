@@ -1,2 +1,7 @@
 server:
   port: 8011
+
+app:
+  url: 127.0.0.1
+  port: 30010
+  token: niushuai233
