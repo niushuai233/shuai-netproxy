@@ -1,13 +1,15 @@
 package cc.niushuai.project.netproxy.client.handler;
 
+import cc.niushuai.project.netproxy.client.config.App;
+import cc.niushuai.project.netproxy.common.constant.KeyConstant;
+import cc.niushuai.project.netproxy.common.entity.ProxyRequest;
+import cn.hutool.json.JSONUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
-
-import java.net.SocketAddress;
 
 /**
  * Netty 客户端处理器
@@ -24,45 +26,26 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        SocketAddress remoteAddress = ctx.channel().remoteAddress();
-        log.info("client| register from: " + remoteAddress);
-
-        super.channelRegistered(ctx);
-    }
-
-    @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        SocketAddress remoteAddress = ctx.channel().remoteAddress();
-        log.info("client| unregister from: " + remoteAddress);
-
-        super.channelUnregistered(ctx);
-    }
-
-    @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        SocketAddress remoteAddress = ctx.channel().remoteAddress();
-        log.info("client| online from: " + remoteAddress);
+        log.info("服务地址: {} 注册成功", ctx.channel().remoteAddress());
 
-        ctx.writeAndFlush(Unpooled.copiedBuffer("Hello Server This Is Client 1", CharsetUtil.UTF_8));
+        ctx.writeAndFlush(Unpooled.copiedBuffer(JSONUtil.toJsonStr(new ProxyRequest(App.Netty.TOKEN, KeyConstant.REGISTER)), CharsetUtil.UTF_8));
 
         super.channelActive(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("client| offline from: " + ctx.channel().remoteAddress());
+        log.warn("从服务端: {} 掉线", ctx.channel().remoteAddress());
 
+        // TODO 此处要重试  直到成功连上
         super.channelInactive(ctx);
-
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        log.info("Receive Message From Client: {} Message: {}", ctx.channel().remoteAddress(), ((ByteBuf) msg).toString(CharsetUtil.UTF_8));
-
-        super.channelRead(ctx, msg);
+        log.info("Receive Message From Server: {} Message: {}", ctx.channel().remoteAddress(), ((ByteBuf) msg).toString(CharsetUtil.UTF_8));
     }
 
     @Override
@@ -76,6 +59,6 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
 
-        log.error("处理器发生异常: {}", cause.getMessage(), cause);
+        log.error("Client端Handler发生异常: {}", cause.getMessage(), cause);
     }
 }

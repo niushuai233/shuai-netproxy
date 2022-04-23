@@ -45,6 +45,7 @@ public class ServerChannelUtil {
         validate(proxyChannelId);
 
         channels.put(proxyChannelId, channel);
+
         log.info("proxyChannelId {} register succeed remoteAddress: {}", proxyChannelId, channel.remoteAddress());
     }
 

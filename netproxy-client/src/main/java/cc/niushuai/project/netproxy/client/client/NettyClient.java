@@ -34,32 +34,42 @@ public class NettyClient implements ApplicationRunner {
 
     @Async
     @Override
-    public void run(ApplicationArguments args) {
+    public void run(ApplicationArguments args) throws Exception {
 
         clientStart();
     }
 
-    private void clientStart() {
-        try {
-            Bootstrap bootstrap = new Bootstrap();
+    private void clientStart() throws Exception {
+        boolean connected = false;
+        do {
+            try {
+                ChannelFuture channelFuture = connect();
 
-            ChannelFuture channelFuture = bootstrap.group(loopGroup)
-                    .channel(NioSocketChannel.class)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new NettyClientHandler());
-                        }
-                    })
-                    // 与服务端建立连接
-                    .connect(App.Netty.URL, App.Netty.PORT).sync();
+                ClientChannelUtil.init(channelFuture);
 
-            ClientChannelUtil.init(channelFuture);
+                connected = true;
+            } catch (Exception e) {
+                log.error("初始化客户端失败: {}", e.getMessage(), e);
+            } finally {
+    //            loopGroup.shutdownGracefully();
+            }
+            Thread.sleep(5000L);
+        }while (!connected);
+    }
 
-        } catch (InterruptedException e) {
-            log.error("初始化客户端失败: {}", e.getMessage(), e);
-        } finally {
-//            loopGroup.shutdownGracefully();
-        }
+    private ChannelFuture connect() throws Exception {
+        Bootstrap bootstrap = new Bootstrap();
+
+        ChannelFuture channelFuture = bootstrap.group(loopGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) {
+                        ch.pipeline().addLast(new NettyClientHandler());
+                    }
+                })
+                // 与服务端建立连接
+                .connect(App.Netty.URL, App.Netty.PORT).sync();
+        return channelFuture;
     }
 }

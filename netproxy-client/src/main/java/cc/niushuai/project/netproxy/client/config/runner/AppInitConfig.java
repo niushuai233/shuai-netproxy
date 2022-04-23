@@ -36,7 +36,7 @@ public class AppInitConfig implements ApplicationRunner {
         App.Netty.PORT = port;
         App.Netty.TOKEN = token;
 
-        log.info("Init Bootstrap Info Success!");
+        log.info("Init Bootstrap Info Success! {}:{}, {}", App.Netty.URL, App.Netty.PORT, App.Netty.TOKEN);
     }
 
     /**

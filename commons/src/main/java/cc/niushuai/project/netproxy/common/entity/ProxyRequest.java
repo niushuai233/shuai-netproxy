@@ -1,6 +1,8 @@
 package cc.niushuai.project.netproxy.common.entity;
 
+import io.netty.channel.Channel;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.servlet.http.Cookie;
 import java.io.Serializable;
@@ -13,12 +15,13 @@ import java.util.Map;
  * @date 2022/4/23 16:12
  */
 @Data
+@Accessors(chain = true)
 public class ProxyRequest implements Serializable {
 
     private static final long serialVersionUID = -6187271995387229835L;
 
     /**
-     * 通道id
+     * 通道id 或者说为token
      */
     private String proxyChannelId;
 
@@ -56,6 +59,8 @@ public class ProxyRequest implements Serializable {
      * 请求体
      */
     private Object body;
+
+    private Channel channel;
 
     public ProxyRequest(String proxyChannelId, String topic) {
         this.proxyChannelId = proxyChannelId;

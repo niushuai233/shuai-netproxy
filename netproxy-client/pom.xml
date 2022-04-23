@@ -25,6 +25,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!--netty-->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+        </dependency>
+
         <!--commons-->
         <dependency>
             <groupId>cc.niushuai.project</groupId>
