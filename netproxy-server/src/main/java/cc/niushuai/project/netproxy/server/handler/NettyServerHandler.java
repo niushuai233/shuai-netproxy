@@ -30,38 +30,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        SocketAddress remoteAddress = ctx.channel().remoteAddress();
-        log.info("client {} register", remoteAddress);
-        log.info("ctx.name channelRegistered = {}", ctx.channel().id().asLongText());
-
-        super.channelRegistered(ctx);
-    }
-
-    @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        log.info("client {} unregister", ctx.channel().remoteAddress());
-        log.info("ctx.name channelUnregistered = {}", ctx.channel().id().asLongText());
-
-        super.channelUnregistered(ctx);
-    }
-
-    @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
-        SocketAddress remoteAddress = ctx.channel().remoteAddress();
-        log.info("client {} online", remoteAddress);
-
-        log.info("ctx.name channelActive = {}", ctx.channel().id().asLongText());
-
+        log.info("client {} online id = {}", ctx.channel().remoteAddress(), ctx.channel().id().asLongText());
 
         super.channelActive(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-
-        log.info("ctx.name channelInactive = {}", ctx.channel().id().asLongText());
+        log.info("client {} offline id = {}", ctx.channel().remoteAddress(), ctx.channel().id().asLongText());
 
         super.channelInactive(ctx);
     }
@@ -70,11 +47,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         String payload = ((ByteBuf) msg).toString(CharsetUtil.UTF_8);
-        log.info("Receive Message From Client: {} Message: {}", ctx.channel().remoteAddress(), payload);
-
-        log.info("ctx.name read = {}", ctx.channel().id().asLongText());
-
-        ;
+        log.info("Receive Message From Client: {} id = {}, message: {}", ctx.channel().remoteAddress(), ctx.channel().id().asLongText(), payload);
 
         ProxyRequest request = JSONUtil.toBean(payload, ProxyRequest.class);
 

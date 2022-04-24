@@ -28,7 +28,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        log.info("服务地址: {} 注册成功", ctx.channel().remoteAddress());
+        log.info("服务地址: {} 成功上线", ctx.channel().remoteAddress());
 
         ctx.writeAndFlush(Unpooled.copiedBuffer(JSONUtil.toJsonStr(new ProxyRequest(App.Netty.TOKEN, KeyConstant.REGISTER)), CharsetUtil.UTF_8));
 
@@ -45,14 +45,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        log.info("Receive Message From Server: {} Message: {}", ctx.channel().remoteAddress(), ((ByteBuf) msg).toString(CharsetUtil.UTF_8));
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-
-        ctx.writeAndFlush(Unpooled.copiedBuffer("Read Complete.", CharsetUtil.UTF_8));
-        log.info("Read Complete.");
+        log.info("收到服务端: {}消息, message: {}", ctx.channel().remoteAddress(), ((ByteBuf) msg).toString(CharsetUtil.UTF_8));
     }
 
     @Override

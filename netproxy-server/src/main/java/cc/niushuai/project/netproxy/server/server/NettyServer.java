@@ -1,12 +1,13 @@
 package cc.niushuai.project.netproxy.server.server;
 
 import cc.niushuai.project.netproxy.server.config.App;
+import cc.niushuai.project.netproxy.server.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -25,6 +26,21 @@ import org.springframework.stereotype.Component;
 @Order(1)
 public class NettyServer implements ApplicationRunner {
 
+    public static ServerBootstrap serverBootstrap;
+
+    /**
+     * 负责处理客户端与服务端的连接请求
+     */
+    public static EventLoopGroup bossGroup = new NioEventLoopGroup();
+
+    /**
+     * 负责处理客户端与服务端的业务数据交换
+     */
+    public static EventLoopGroup workGroup = new NioEventLoopGroup();
+
+    public static ChannelFuture channelFuture = null;
+
+    public static NettyServerHandler serverHandler;
 
 
     @Async
@@ -36,9 +52,9 @@ public class NettyServer implements ApplicationRunner {
 
     private void nettyServerStart() {
         try {
-            App.serverBootstrap = new ServerBootstrap();
+            serverBootstrap = new ServerBootstrap();
 
-            App.channelFuture = App.serverBootstrap.group(App.bossGroup, App.workGroup)
+            channelFuture = serverBootstrap.group(bossGroup, workGroup)
                     // 使用NioSocketChannel 作为服务器的通道实现
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -49,7 +65,9 @@ public class NettyServer implements ApplicationRunner {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(App.serverHandler);
+                            ch.pipeline()
+                                    .addLast(new IdleStateHandler(10,10,0))
+                                    .addLast(new NettyServerHandler());
                         }
                     })
 //                    .bind(App.Netty.BIND_HOST, App.Netty.BIND_PORT)
@@ -57,7 +75,7 @@ public class NettyServer implements ApplicationRunner {
                     .sync();
 
 
-            App.channelFuture.addListener((ChannelFutureListener) future -> {
+            channelFuture.addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
                     log.info("Netty Server Started At {}:{}", App.Netty.BIND_HOST, App.Netty.BIND_PORT);
                 } else {
@@ -68,8 +86,8 @@ public class NettyServer implements ApplicationRunner {
         } catch (InterruptedException e) {
             log.error("Netty Server Runtime Occurs Something {}", e.getMessage(), e);
         } finally {
-//            App.bossGroup.shutdownGracefully();
-//            App.workGroup.shutdownGracefully();
+//            bossGroup.shutdownGracefully();
+//            workGroup.shutdownGracefully();
         }
     }
 }
