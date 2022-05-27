@@ -44,6 +44,12 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
+        <!--sofa-bolt-->
+        <dependency>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>bolt</artifactId>
+        </dependency>
+
         <!--commons-->
         <dependency>
             <groupId>cc.niushuai.project</groupId>

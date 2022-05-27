@@ -29,6 +29,7 @@
 
         <hutool.version>5.7.22</hutool.version>
         <mybatis-plus.version>3.5.1</mybatis-plus.version>
+        <sofa-bolt.version>1.6.5</sofa-bolt.version>
     </properties>
 
     <dependencyManagement>
@@ -56,6 +57,12 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.alipay.sofa</groupId>
+                <artifactId>bolt</artifactId>
+                <version>${sofa-bolt.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -71,11 +78,6 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
         </dependency>
     </dependencies>
 
